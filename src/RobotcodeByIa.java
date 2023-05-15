@@ -7,6 +7,6 @@ public class RobotcodeByIa  extends AdvancedRobot {
         while(true) {}
     }        public void onScannedRobot (robocode.ScannedRobotEvent e) {
         /** function_content_area **/
-        fire();
+
     }
 }
