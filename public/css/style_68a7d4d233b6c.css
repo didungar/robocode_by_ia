@@ -1,0 +1,28 @@
+html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Titre de la page</title>
+    <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+    <header class="header">
+        <nav class="navbar">
+            <ul class="navbar-list">
+                <li><a href="#" class="navbar-item active">Accueil</a></li>
+                <li><a href="#" class="navbar-item">A propos</a></li>
+                <li><a href="#" class="navbar-item">Contact</a></li>
+            </ul>
+        </nav>
+    </header>
+    <main class="main">
+        <h1>Titre de la page</h1>
+        <p>Contenu de la page</p>
+    </main>
+    <footer class="footer">
+        <p>&copy; Copyright 2023</p>
+    </footer>
+</body>
+</html>
