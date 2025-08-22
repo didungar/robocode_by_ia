@@ -1,58 +1,45 @@
-javascript
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import React, { useState } from 'react';
 
-const ItemList = () => {
-  const [scores, setScores] = useState([]);
-  const [loading, setLoading] = useState(false);
+function Search() {
+  const [query, setQuery] = useState('');
+  const [results, setResults] = useState([]);
 
-  useEffect(() => {
-    getScores();
-  }, []);
-
-  const getScores = async () => {
-    try {
-      const response = await axios.get('https://api.hubspot.com/crm-pipelines');
-      setScores(response.data);
-    } catch (error) {
-      console.error(error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleSubmit = async (event) => {
-    event.preventDefault();
-    try {
-      const response = await axios.post('https://api.hubspot.com/crm-pipelines', {
-        name: 'My Score',
-        description: 'This is my score'
-      });
-      setScores([...scores, response.data]);
-    } catch (error) {
-      console.error(error);
-    } finally {
-      setLoading(false);
+  const handleSearch = (e) => {
+    e.preventDefault();
+    const queryValue = e.target.value;
+    setQuery(queryValue);
+    if (queryValue !== '') {
+      fetch(`https://api.example.com/scores?q=${encodeURIComponent(queryValue)}`)
+        .then((response) => response.json())
+        .then((data) => {
+          setResults(data);
+        })
+        .catch((error) => {
+          console.error('Error:', error);
+        });
+    } else {
+      setResults([]);
     }
   };
 
   return (
     <div>
-      <h1>Scores</h1>
-      <ul>
-        {scores.map((score, index) => (
-          <li key={index}>{score.name}</li>
-        ))}
-      </ul>
-      <form onSubmit={handleSubmit}>
-        <label>Name:</label>
-        <input type="text" name="name" />
-        <label>Description:</label>
-        <textarea name="description"></textarea>
-        <button type="submit">Add Score</button>
+      <form onSubmit={handleSearch}>
+        <input
+          type="text"
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          placeholder="Rechercher un score..."
+        />
+        <button type="submit">Rechercher</button>
       </form>
+      {results.length > 0 && (
+        <ul>
+          {results.map((result) => (
+            <li key={result.id}>{result.score}</li>
+          ))}
+        </ul>
+      )}
     </div>
   );
-};
-
-export default ItemList;
+}
