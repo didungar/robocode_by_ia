@@ -1,25 +1,71 @@
 import React, { useState } from 'react';
+import { database } from './uncategorized/database';
 
-function TermsAndConditions() {
-  const [accepted, setAccepted] = useState(false);
+function Game() {
+  const [deck, setDeck] = useState([]); // Initialise le deck de cartes avec un tableau vide
+  const [playerHand, setPlayerHand] = useState([]); // Initialise la main du joueur avec un tableau vide
+  const [opponentHand, setOpponentHand] = useState([]); // Initialise la main de l'adversaire avec un tableau vide
+  const [turn, setTurn] = useState('player'); // Initialise le tour avec le nom du joueur
+  const [score, setScore] = useState({ player: 0, opponent: 0 }); // Initialise les scores avec zéro pour chaque joueurs
 
-  const handleAccept = () => {
-    setAccepted(true);
-  };
+  // Fonction permettant de placer une carte dans la main du joueur
+  function drawCard() {
+    if (deck.length > 0) {
+      const card = deck[0];
+      setPlayerHand([...playerHand, card]);
+      setDeck(deck.slice(1));
+    }
+  }
+
+  // Fonction permettant de placer une carte dans la main de l'adversaire
+  function drawOpponentCard() {
+    if (opponentHand.length === 0) {
+      const card = deck[0];
+      setOpponentHand([...opponentHand, card]);
+      setDeck(deck.slice(1));
+    }
+  }
+
+  // Fonction permettant de gagner un tour
+  function winRound() {
+    if (turn === 'player') {
+      const newScore = { player: score.player + 1, opponent: score.opponent };
+      setScore(newScore);
+      setTurn('opponent');
+    } else {
+      const newScore = { player: score.player, opponent: score.opponent + 1 };
+      setScore(newScore);
+      setTurn('player');
+    }
+  }
+
+  // Fonction permettant de gagner la partie
+  function winGame() {
+    if (score.player > score.opponent) {
+      console.log('Joueur a gagné !');
+    } else if (score.player < score.opponent) {
+      console.log('Adversaire a gagné !');
+    } else {
+      console.log('Match nul !');
+    }
+  }
+
+  // Fonction permettant de remettre la partie en l'état initial après chaque tour
+  function resetRound() {
+    setPlayerHand([]);
+    setOpponentHand([]);
+    setTurn('player');
+  }
 
   return (
     <div>
-      <h1>Terms and Conditions</h1>
-      <p>
-        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed eu lectus in felis aliquam mollis nec et diam. Proin
-        eget justo at odio dictum pretium non a eros. Donec sed tellus quis dui tincidunt ultrices. Vestibulum ante ipsum primis
-        in faucibus orci luctus et ultrices posuere cubilia Curae; Phasellus vestibulum nunc nec lectus volutpat, at aliquam
-        diam elementum. Curabitur at velit sit amet magna egestas scelerisque sed eu quam. Donec ac metus id dolor tincidunt
-        consequat et a nisl. Vestibulum in urna vel massa lacinia mollis nec ac eros. Aliquam erat volutpat. Sed sit amet
-        sapien at odio iaculis semper. Nullam ut lectus id est vestibulum blandit. Proin eget aliquet justo, vel scelerisque
-        nulla. Nunc a tellus nec dui elementum tempus.
-      </p>
-      <button onClick={handleAccept}>I accept the terms and conditions</button>
+      <h1>Jeu de cartes</h1>
+      <button onClick={drawCard}>Joueur : {score.player}</button>
+      <button onClick={drawOpponentCard}>Adversaire : {score.opponent}</button>
+      <button onClick={winRound}>Gagner le tour</button>
+      <button onClick={resetRound}>Remettre le partie en l'état initial</button>
     </div>
   );
 }
+
+export default Game;

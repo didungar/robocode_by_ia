@@ -1,33 +1,58 @@
-import React, { useState } from 'react';
+javascript
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 
-function DataEntryForm() {
-  const [name, setName] = useState('');
-  const [age, setAge] = useState(0);
-  const [email, setEmail] = useState('');
+const ItemList = () => {
+  const [scores, setScores] = useState([]);
+  const [loading, setLoading] = useState(false);
 
-  const handleSubmit = (event) => {
+  useEffect(() => {
+    getScores();
+  }, []);
+
+  const getScores = async () => {
+    try {
+      const response = await axios.get('https://api.hubspot.com/crm-pipelines');
+      setScores(response.data);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSubmit = async (event) => {
     event.preventDefault();
-    console.log(`Name: ${name}, Age: ${age}, Email: ${email}`);
+    try {
+      const response = await axios.post('https://api.hubspot.com/crm-pipelines', {
+        name: 'My Score',
+        description: 'This is my score'
+      });
+      setScores([...scores, response.data]);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
-    <form onSubmit={handleSubmit}>
-      <label>
-        Name:
-        <input type="text" value={name} onChange={(event) => setName(event.target.value)} />
-      </label>
-      <br />
-      <label>
-        Age:
-        <input type="number" value={age} onChange={(event) => setAge(event.target.value)} />
-      </label>
-      <br />
-      <label>
-        Email:
-        <input type="email" value={email} onChange={(event) => setEmail(event.target.value)} />
-      </label>
-      <br />
-      <button type="submit">Submit</button>
-    </form>
+    <div>
+      <h1>Scores</h1>
+      <ul>
+        {scores.map((score, index) => (
+          <li key={index}>{score.name}</li>
+        ))}
+      </ul>
+      <form onSubmit={handleSubmit}>
+        <label>Name:</label>
+        <input type="text" name="name" />
+        <label>Description:</label>
+        <textarea name="description"></textarea>
+        <button type="submit">Add Score</button>
+      </form>
+    </div>
   );
-}
+};
+
+export default ItemList;
