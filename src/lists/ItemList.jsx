@@ -1,42 +1,53 @@
-javascript
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import React, { useState } from 'react';
+import './App.css';
 
-const Score = () => {
-  const [scores, setScores] = useState([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState(null);
+function App() {
+  const [files, setFiles] = useState([]);
+  const [importedFiles, setImportedFiles] = useState([]);
+  const [exportedFiles, setExportedFiles] = useState([]);
 
-  // Fonction pour récupérer les scores et le jeu en cours
-  const fetchData = async () => {
-    try {
-      const response = await axios.get('http://localhost:3000/api/scores');
-      setScores(response.data);
-      setIsLoading(false);
-    } catch (error) {
-      setError(error);
-      setIsLoading(false);
+  const handleFileChange = (e) => {
+    const files = e.target.files;
+    setFiles(files);
+
+    // Vérification des imports et exports dans chaque fichier
+    for (const file of files) {
+      if (!file.name.endsWith('.js')) continue;
+
+      let importRegex = /^import\s+(?:(?:\w+)\s*,\s*)?\w+\s+from\s+'([^']+)'\s*$/mg;
+      let exportRegex = /^export\s+(?:class|function|const)\s+(\w+)/mg;
+
+      const imports = [];
+      for (let match of file.content.matchAll(importRegex)) {
+        imports.push({ name: match[1] });
+      }
+
+      const exports = [];
+      for (let match of file.content.matchAll(exportRegex)) {
+        exports.push({ name: match[1] });
+      }
+
+      setImportedFiles((prevState) => [...prevState, ...imports]);
+      setExportedFiles((prevState) => [...prevState, ...exports]);
     }
   };
 
-  // Utilisez useEffect pour récupérer les scores et le jeu en cours lors du mounting du composant
-  useEffect(() => {
-    fetchData();
-  }, []);
-
   return (
-    <div>
-      {isLoading ? (
-        <div>Chargement...</div>
-      ) : (
-        <ul>
-          {scores.map((score) => (
-            <li key={score.id}>{score.name} - {score.value}</li>
-          ))}
-        </ul>
-      )}
+    <div className="App">
+      <header className="App-header">
+        <p>Vérification des imports et exports</p>
+        <input type="file" onChange={handleFileChange} />
+      </header>
+      <ul>
+        {importedFiles.map((importedFile) => (
+          <li key={importedFile.name}>{importedFile.name}</li>
+        ))}
+        {exportedFiles.map((exportedFile) => (
+          <li key={exportedFile.name}>{exportedFile.name}</li>
+        ))}
+      </ul>
     </div>
   );
-};
+}
 
-export default Score;
+export default App;

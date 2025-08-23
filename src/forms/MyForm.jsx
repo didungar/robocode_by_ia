@@ -4,42 +4,28 @@ function Search() {
   const [query, setQuery] = useState('');
   const [results, setResults] = useState([]);
 
-  const handleSearch = (e) => {
-    e.preventDefault();
-    const queryValue = e.target.value;
-    setQuery(queryValue);
-    if (queryValue !== '') {
-      fetch(`https://api.example.com/scores?q=${encodeURIComponent(queryValue)}`)
-        .then((response) => response.json())
-        .then((data) => {
-          setResults(data);
-        })
-        .catch((error) => {
-          console.error('Error:', error);
-        });
-    } else {
-      setResults([]);
-    }
+  const handleSubmit = (event) => {
+    event.preventDefault();
+    fetch(`https://api.example.com/scores?q=${query}`)
+      .then((response) => response.json())
+      .then((data) => {
+        setResults(data);
+      });
   };
 
   return (
     <div>
-      <form onSubmit={handleSearch}>
-        <input
-          type="text"
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          placeholder="Rechercher un score..."
-        />
-        <button type="submit">Rechercher</button>
+      <form onSubmit={handleSubmit}>
+        <label htmlFor="search">Search:</label>
+        <input type="text" id="search" value={query} onChange={(event) => setQuery(event.target.value)} />
+        <button type="submit">Search</button>
       </form>
-      {results.length > 0 && (
-        <ul>
-          {results.map((result) => (
-            <li key={result.id}>{result.score}</li>
-          ))}
-        </ul>
-      )}
+      {results.map((result) => (
+        <div key={result.id}>
+          <h2>{result.name}</h2>
+          <p>{result.description}</p>
+        </div>
+      ))}
     </div>
   );
 }
